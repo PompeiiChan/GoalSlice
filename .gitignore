@@ -3,6 +3,10 @@ backend/.env
 frontend/.env.local
 frontend/.env.*.local
 
+# SDD Harness 内部文件（不进入公开仓库）
+.sdd/
+AGENTS.md
+
 # Python
 __pycache__/
 *.py[cod]
@@ -15,6 +19,11 @@ __pycache__/
 # SQLite
 *.db
 *.sqlite3
+
+# Logs
+logs/
+*.log
+backend/logs/
 
 # OS
 .DS_Store
