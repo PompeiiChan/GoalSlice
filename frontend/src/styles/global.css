@@ -1,0 +1,77 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.app-shell {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page-content {
+  padding: 24px;
+  padding-bottom: 32px;
+}
+
+.page-placeholder {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    min-height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 390px) {
+  .page-content {
+    padding: 20px 16px;
+  }
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GoalSlice 就这 — 交互原型</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <!--
+    B2 原型 · 单机流程演示
+    形态：移动端 H5 优先（390×844），桌面居中 640px
+    路径：首页 → 澄清 → 主线预览 → 每日任务 → 完成反馈 → 中枢 → 周复盘
+    非生产代码，仅供设计验证
+  -->
+</head>
+<body>
+  <div class="app">
+    <!-- 顶栏 -->
+    <header class="header header--simple">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <span>GoalSlice 就这</span>
+      </div>
+      <div class="header-center">练就会议总结力</div>
+      <div class="header-right">
+        <span class="progress-text">2/7</span>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width: 29%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- P01 首页 -->
+    <section id="screen-home" class="screen active">
+      <div class="content">
+        <h1 class="display-title">把长期目标，变成这一周能完成的小事件。</h1>
+        <p class="subtitle">每天一件事，低压力推进你的职业成长。</p>
+        <textarea
+          id="goal-input"
+          class="textarea"
+          placeholder="你最近最想推进的一件职业成长目标是什么？"
+          rows="4"
+        ></textarea>
+        <div class="chips">
+          <button type="button" class="chip" data-goal="我想转行到一个新行业，但不知道从哪入手">转行到新行业</button>
+          <button type="button" class="chip" data-goal="我想系统准备接下来的面试">准备面试</button>
+          <button type="button" class="chip" data-goal="我想提升自己的复盘能力">提升复盘能力</button>
+          <button type="button" class="chip" data-goal="我想提升自己的文档写作能力">提升文档写作能力</button>
+          <button type="button" class="chip" data-goal="我想提升自己的会议总结能力">提升会议总结能力</button>
+        </div>
+        <button type="button" id="btn-start" class="btn btn-primary" disabled>开始拆解</button>
+        <a href="#" id="link-continue" class="link-secondary">继续本周副本 →</a>
+      </div>
+    </section>
+
+    <!-- P02 目标澄清 -->
+    <section id="screen-clarify" class="screen">
+      <div class="content">
+        <div class="step-indicator">
+          <div id="step-dots" class="step-dots"></div>
+          <span id="step-label" class="step-label">题 1/5</span>
+        </div>
+        <h2 id="clarify-question" class="display-title" style="font-size: 22px"></h2>
+        <p class="subtitle">选一个最贴近你的选项，也可以跳过。</p>
+        <div id="option-list" class="option-list"></div>
+        <input type="text" class="input-small" placeholder="可选：补充一句你的想法…" />
+        <div class="btn-row">
+          <button type="button" id="btn-clarify-skip" class="btn btn-secondary">跳过</button>
+          <button type="button" id="btn-clarify-next" class="btn btn-primary" disabled>下一题</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- P03 本周主线预览 -->
+    <section id="screen-preview" class="screen">
+      <div class="content">
+        <p class="card-label">你的本周主线</p>
+        <h2 id="preview-title" class="section-title">从「会议听完就忘」到「能写出可执行的会议总结」</h2>
+        <div class="card">
+          <div class="card-label" style="color: var(--primary)">本周通关条件</div>
+          <p id="preview-condition" style="font-size: 15px">完成一份真实会议的总结稿（含背景、决议、待办）</p>
+        </div>
+        <ul id="week-timeline" class="timeline"></ul>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px">
+          预计总投入：每天约 15–30 分钟，共 7 天
+        </p>
+        <button type="button" id="btn-accept-plan" class="btn btn-primary">开始 Day 1</button>
+        <button type="button" id="btn-regenerate" class="btn btn-text" style="width: 100%; margin-top: 12px">重新生成计划</button>
+      </div>
+    </section>
+
+    <!-- P04 每日任务 -->
+    <section id="screen-daily" class="screen">
+      <div class="content">
+        <div class="tags-row">
+          <span id="daily-day-tag" class="tag tag-day">Day 3</span>
+          <span class="tag tag-time">预计 15 分钟</span>
+        </div>
+        <div class="card card--quest">
+          <h2 id="daily-title" class="section-title">用四格模板填空总结一场会</h2>
+          <p id="daily-desc" style="font-size: 15px; margin-bottom: 4px">
+            选一场你最近参加的会，按「背景 → 讨论 → 决议 → 待办」四格，每格写 1–2 句话。不用完美，先填满。
+          </p>
+          <div class="meaning-block">
+            <div class="meaning-block-title">为什么做这一步</div>
+            <p id="daily-meaning">
+              会议总结难，往往难在不知道从何写起。四格模板把模糊感受变成固定结构，你先求「写完」，再求「写好」。
+            </p>
+          </div>
+          <div id="daily-input-area">
+            <textarea
+              id="daily-input"
+              class="textarea"
+              style="min-height: 80px"
+              placeholder="贴上你的四格填空，或写下最难写的那一格…"
+            ></textarea>
+          </div>
+        </div>
+        <button type="button" id="btn-complete" class="btn btn-primary">我已经完成</button>
+        <button type="button" id="btn-downgrade" class="btn btn-text btn-text--warning" style="width: 100%">
+          今天太难了，帮我降级
+        </button>
+      </div>
+    </section>
+
+    <!-- P05 完成反馈 -->
+    <section id="screen-feedback" class="screen">
+      <div class="content">
+        <div class="complete-hero">
+          <div class="check-ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="complete-title"><span id="feedback-day">Day 3</span> 已完成</div>
+          <div id="feedback-sub" class="complete-sub">你今天完成的是「四格模板练习」</div>
+        </div>
+        <div class="meaning-block">
+          <div class="meaning-block-title">这一步的意义</div>
+          <p id="feedback-meaning">
+            你第一次把「我想提升会议总结能力」从模糊感受，变成了可重复使用的结构。以后每场会都有抓手，而不是听完就散。
+          </p>
+        </div>
+        <div style="margin: 20px 0">
+          <span style="font-size: 13px; color: var(--text-secondary)">获得成长资产</span>
+          <div class="asset-wall" style="margin-top: 8px">
+            <span class="tag tag-asset">总结模板碎片 ×1</span>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>本周进度</span>
+            <span id="feedback-progress-text">3 / 7</span>
+          </div>
+          <div class="progress-track">
+            <div id="feedback-progress-fill" class="progress-track-fill" style="width: 43%"></div>
+          </div>
+        </div>
+        <div class="tomorrow-preview">
+          明天解锁：<strong id="tomorrow-title">找一份好纪要范例，标出 2 个可学习的写法</strong>
+        </div>
+        <button type="button" id="btn-feedback-done" class="btn btn-primary">好的，明天见</button>
+      </div>
+    </section>
+
+    <!-- P08 进行中枢 -->
+    <section id="screen-hub" class="screen">
+      <div class="content">
+        <div class="card hub-card">
+          <div class="hub-progress-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#E5E5EA" stroke-width="6"/>
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#E8463A" stroke-width="6"
+                stroke-dasharray="213.6" stroke-dashoffset="152.6" stroke-linecap="round"/>
+            </svg>
+            <div class="hub-progress-text">2/7</div>
+          </div>
+          <p class="card-label">本周主线</p>
+          <h2 id="hub-title" class="section-title" style="font-size: 18px">从「会议听完就忘」到「能写出可执行的会议总结」</h2>
+          <p id="hub-condition" style="font-size: 14px; color: var(--text-secondary); margin-top: 8px">
+            通关条件：完成一份真实会议的总结稿（含背景、决议、待办）
+          </p>
+        </div>
+        <button type="button" id="btn-go-daily" class="btn btn-primary">进入今日任务</button>
+        <div class="card" style="margin-top: 20px">
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 12px">已获得的成长资产</div>
+          <div class="asset-wall">
+            <span class="tag tag-asset">总结场景卡 ×1</span>
+            <span class="tag tag-asset">总结模板碎片 ×1</span>
+          </div>
+        </div>
+        <a href="#" id="link-view-plan" class="link-secondary">查看完整主线 →</a>
+      </div>
+    </section>
+
+    <!-- P07 周复盘 -->
+    <section id="screen-review" class="screen">
+      <div class="content">
+        <div class="card card--boss">
+          <div class="card-label">本周 Boss 战 · 已完成</div>
+          <h2 id="review-boss-title" class="section-title">你不再只是「想写好纪要」，而是有了一份能直接用的总结方法</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">5</div>
+            <div class="stat-label">完成小事件</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">产出物</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 12px">本周你推进了</div>
+          <ul id="review-list" style="font-size: 14px; padding-left: 18px; color: var(--text-secondary); line-height: 1.8">
+            <li>列出 3 场难总结的会议场景</li>
+            <li>找出旧纪要里缺失的关键信息</li>
+            <li>完成一次四格模板填空练习</li>
+            <li>拆解一份优秀纪要范例</li>
+            <li>写出一场会的 5 句核心结论</li>
+          </ul>
+        </div>
+        <div style="margin-bottom: 16px">
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px">成长资产</div>
+          <div class="asset-wall">
+            <span class="tag tag-asset">总结场景卡 ×1</span>
+            <span class="tag tag-asset">总结模板碎片 ×2</span>
+            <span class="tag tag-asset">总结范例 ×1</span>
+          </div>
+        </div>
+        <div id="review-observation" class="observation">你在填空和拆解类任务上完成度高，写完整段落时容易拖延。</div>
+        <div class="card" style="border-color: var(--accent)">
+          <div class="card-label">下一周建议</div>
+          <p id="next-week-title" style="font-size: 15px; font-weight: 500">进入「文档写作副本」</p>
+          <p id="next-week-desc" style="font-size: 14px; color: var(--text-secondary); margin-top: 6px">
+            把会议总结能力延伸到日常文档输出，练一份结构清晰的工作说明
+          </p>
+        </div>
+        <button type="button" id="btn-next-week" class="btn btn-primary">开启下一周副本</button>
+        <button type="button" id="btn-pause" class="btn btn-text" style="width: 100%; margin-top: 12px">暂停，下次再说</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- P06 任务降级 Modal -->
+  <div id="modal-downgrade" class="modal-overlay">
+    <div class="modal">
+      <h3 class="modal-title">帮你缩小今天的任务</h3>
+      <p class="modal-desc">选一个你能接受的版本，完成仍算有效推进。</p>
+      <div class="downgrade-option" data-id="5min">
+        <div class="downgrade-option-title">5 分钟版</div>
+        <div class="downgrade-option-desc">回忆最近一场会，写下会议名 + 1 个你还记得的结论，两句话就够。</div>
+      </div>
+      <div class="downgrade-option" data-id="step1">
+        <div class="downgrade-option-title">只做第一步</div>
+        <div class="downgrade-option-desc">只填四格模板里的「决议」一格，其他先空着。</div>
+      </div>
+      <div class="downgrade-option" data-id="tomorrow">
+        <div class="downgrade-option-title">明天继续</div>
+        <div class="downgrade-option-desc">今天先休息，明天从原任务继续，不判失败。</div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-cancel-downgrade" class="btn btn-secondary">取消</button>
+        <button type="button" id="btn-apply-downgrade" class="btn btn-primary" disabled>采用这个版本</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

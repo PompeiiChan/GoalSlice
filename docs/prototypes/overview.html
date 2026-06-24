@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoalSlice 就这 — 全页面平铺预览</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .static-screen { padding-bottom: 24px; border-bottom: 8px solid var(--border); }
+    .static-screen:last-child { border-bottom: none; }
+    .static-label {
+      background: var(--primary);
+      color: #fff;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .overview-app { max-width: 390px; margin: 0 auto; box-shadow: var(--shadow-md); }
+  </style>
+</head>
+<body>
+  <div class="overview-body">
+    <div class="overview-header">
+      <h1>GoalSlice 就这 — 全页面平铺预览</h1>
+      <p>8 个 MVP 界面静态快照。演示主线：提升会议总结能力。可点击流程请打开 <a href="index.html">index.html</a></p>
+    </div>
+    <div class="overview-grid">
+
+      <div class="overview-frame">
+        <div class="static-label">P01 首页（目标输入）</div>
+        <div class="overview-app app static-screen">
+          <header class="header header--simple">
+            <div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div>
+          </header>
+          <div class="content">
+            <h1 class="display-title" style="font-size: 24px">把长期目标，变成这一周能完成的小事件。</h1>
+            <p class="subtitle">每天一件事，低压力推进你的职业成长。</p>
+            <textarea class="textarea" placeholder="你最近最想推进的一件职业成长目标是什么？"></textarea>
+            <div class="chips">
+              <span class="chip">转行到新行业</span>
+              <span class="chip">准备面试</span>
+              <span class="chip">提升复盘能力</span>
+              <span class="chip">提升文档写作能力</span>
+              <span class="chip">提升会议总结能力</span>
+            </div>
+            <button class="btn btn-primary">开始拆解</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P02 目标澄清</div>
+        <div class="overview-app app static-screen">
+          <header class="header"><div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div></header>
+          <div class="content">
+            <div class="step-indicator">
+              <div class="step-dots"><span class="step-dot done"></span><span class="step-dot active"></span><span class="step-dot"></span></div>
+              <span class="step-label">题 2/5</span>
+            </div>
+            <h2 class="display-title" style="font-size: 20px">如果只看这一周，你希望自己发生什么变化？</h2>
+            <div class="option-list">
+              <div class="option-card selected">完成一个具体产物</div>
+              <div class="option-card">明确下一步方向</div>
+              <div class="option-card">开始行动，不再只想</div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-secondary">跳过</button>
+              <button class="btn btn-primary">下一题</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P03 本周主线预览</div>
+        <div class="overview-app app static-screen">
+          <header class="header">
+            <div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div>
+            <div class="header-center">练就会议总结力</div>
+          </header>
+          <div class="content">
+            <p class="card-label">你的本周主线</p>
+            <h2 class="section-title" style="font-size: 17px">从「会议听完就忘」到「能写出可执行的会议总结」</h2>
+            <div class="card"><div class="card-label" style="color:var(--primary)">本周通关条件</div><p>完成一份真实会议的总结稿</p></div>
+            <ul class="timeline">
+              <li class="timeline-item done"><div class="timeline-dot">1</div><div class="timeline-content"><div class="timeline-title">列出最近 3 场会，标出最难总结的一场</div></div></li>
+              <li class="timeline-item boss"><div class="timeline-dot">★</div><div class="timeline-content"><div class="timeline-title">Boss 战 · 独立完成一场真实会议的总结稿</div></div></li>
+            </ul>
+            <button class="btn btn-primary">开始 Day 1</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P04 每日任务</div>
+        <div class="overview-app app static-screen">
+          <header class="header">
+            <div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div>
+            <div class="header-right"><span class="progress-text">2/7</span><div class="progress-bar"><div class="progress-bar-fill" style="width:29%"></div></div></div>
+          </header>
+          <div class="content">
+            <div class="tags-row"><span class="tag tag-day">Day 3</span><span class="tag tag-time">预计 15 分钟</span></div>
+            <div class="card card--quest">
+              <h2 class="section-title">用四格模板填空总结一场会</h2>
+              <p style="font-size:14px">按「背景 → 讨论 → 决议 → 待办」四格，每格写 1–2 句话。</p>
+              <div class="meaning-block"><div class="meaning-block-title">为什么做这一步</div><p>四格模板把模糊感受变成固定结构。</p></div>
+              <textarea class="textarea" style="min-height:60px" placeholder="贴上四格填空…"></textarea>
+            </div>
+            <button class="btn btn-primary">我已经完成</button>
+            <button class="btn btn-text btn-text--warning" style="width:100%">今天太难了，帮我降级</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P05 完成反馈（签名锚点）</div>
+        <div class="overview-app app static-screen">
+          <header class="header"><div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div></header>
+          <div class="content">
+            <div class="complete-hero">
+              <div class="check-ring"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="complete-title">Day 3 已完成</div>
+            </div>
+            <div class="asset-wall"><span class="tag tag-asset">总结模板碎片 ×1</span></div>
+            <div class="progress-section"><div class="progress-track"><div class="progress-track-fill" style="width:43%"></div></div></div>
+            <button class="btn btn-primary">好的，明天见</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P06 任务降级 Modal</div>
+        <div class="overview-app app static-screen" style="position:relative; min-height:500px; background:rgba(0,0,0,0.3)">
+          <div class="modal" style="position:absolute; bottom:0; left:0; right:0; border-radius:16px 16px 0 0">
+            <h3 class="modal-title">帮你缩小今天的任务</h3>
+            <div class="downgrade-option selected"><div class="downgrade-option-title">5 分钟版</div><div class="downgrade-option-desc">写下一场会的名字 + 1 个结论，两句话就够。</div></div>
+            <button class="btn btn-primary">采用这个版本</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P07 周复盘</div>
+        <div class="overview-app app static-screen">
+          <header class="header"><div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div></header>
+          <div class="content">
+            <div class="card card--boss"><div class="card-label">本周 Boss 战 · 已完成</div><h2 class="section-title" style="font-size:16px">你有了能直接用的会议总结方法</h2></div>
+            <div class="stats-grid"><div class="stat-card"><div class="stat-value">5</div><div class="stat-label">完成小事件</div></div><div class="stat-card"><div class="stat-value">3</div><div class="stat-label">产出物</div></div></div>
+            <button class="btn btn-primary">开启下一周副本</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-frame">
+        <div class="static-label">P08 进行中枢</div>
+        <div class="overview-app app static-screen">
+          <header class="header">
+            <div class="logo"><div class="logo-mark"></div><span>GoalSlice 就这</span></div>
+            <div class="header-right"><span class="progress-text">2/7</span></div>
+          </header>
+          <div class="content">
+            <div class="card hub-card">
+              <div class="hub-progress-text" style="font-size:32px; color:var(--primary); margin-bottom:12px">2/7</div>
+              <h2 class="section-title" style="font-size:17px">练就会议总结力</h2>
+            </div>
+            <button class="btn btn-primary">进入今日任务</button>
+            <div class="asset-wall" style="margin-top:16px"><span class="tag tag-asset">总结模板碎片 ×1</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

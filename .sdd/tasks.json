@@ -1,0 +1,577 @@
+{
+  "project": "GoalSlice 就这",
+  "project_type": "web",
+  "created": "2026-06-24",
+  "source_files": {
+    "prd": "docs/PRD.md",
+    "plan": "docs/Plan.md",
+    "api_contracts": "docs/api-contracts.md"
+  },
+  "external_services": [
+    {
+      "name": "硅基流动 LLM",
+      "required": true,
+      "config_keys": ["LLM_API_KEY_A", "LLM_API_KEY_B", "LLM_BASE_URL", "LLM_MODEL"],
+      "tester_access_required": "用户提供双 Key + 可调用 Qwen/Qwen3.5-27B；主备路由见 backend/.env.example",
+      "fallback_allowed": true,
+      "status": "confirmed"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "前端脚手架 + Ant Design R1 token + 路由 + Session",
+      "type": "frontend",
+      "description": "初始化 frontend/ 工程：Vite + React 18 + TypeScript + Ant Design 5；注入 R1 珊瑚红设计 token（Primary #E8463A）；配置 react-router v6 八页路由骨架（P01–P08）；实现 Zustand session store（首次访问生成 UUID 写入 localStorage）；配置 Axios 实例与 X-Session-Id 拦截器；设置 VITE_USE_MOCK=true、VITE_API_BASE_URL=/api；vite.config.ts 配置 server.proxy['/api'] 指向后端（Agent 验证端口 8099）；390px/1280px 居中单栏布局骨架；不得实现完整页面业务，仅路由守卫与 AppHeader 占位。",
+      "source_feature": "F-01-01, Plan 阶段1",
+      "acceptanceCriteria": [
+        "开发者在浏览器打开前端（Agent 端口 5199），可见 R1 珊瑚红主题色与 #F5F5F7 背景，顶栏含 Logo 占位",
+        "直接访问 /、/clarify、/quest/preview、/quest/today、/quest/feedback、/quest/review、/hub 均有对应路由页面骨架（可为占位内容）",
+        "首次访问后 localStorage 写入 session_id，刷新页面 session_id 保持不变",
+        "页面无登录入口（MVP 无用户登录）"
+      ],
+      "technicalChecks": [
+        "npm run type-check 通过",
+        "npm run lint 通过",
+        "npm run build 通过",
+        "frontend/vite.config.ts 已配置 server.proxy['/api'] 指向 http://localhost:8099（Agent 验证端口）",
+        "frontend/.env 中 VITE_API_BASE_URL=/api（相对路径，禁止写完整 URL）",
+        "VITE_USE_MOCK=true 为默认开发配置",
+        "390px 与 1280px 视口下布局无横向溢出"
+      ],
+      "frontendIntegration": {
+        "required": false,
+        "pages": [],
+        "services": [],
+        "realApiEndpoints": [],
+        "mockExitCriteria": []
+      },
+      "externalServices": [],
+      "dependencies": [],
+      "priority": 1,
+      "rules_files": ["dev-standards/frontend.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "系统经验：Vite 必须 proxy /api；VITE_API_BASE_URL 使用相对路径 /api。Agent 验证前端 5199、后端 8099；用户门禁验收使用 5175/8003。本任务不涉及真实后端联调。[Developer 2026-06-24] frontend/ 脚手架已交付。[Tester 2026-06-24] 全项 PASS，详见 .sdd/test-reports/test-T-001.md",
+      "user_gate": false
+    },
+    {
+      "id": "T-002",
+      "title": "前端全页面 Mock 闭环 P01–P08",
+      "type": "frontend",
+      "description": "基于 T-001 脚手架，按 docs/prototypes/ 与 PRD 实现 P01–P08 完整 UI/UX 与 Mock 数据闭环。Mock 数据存放 frontend/src/mocks/，结构与 api-contracts.md 一致。VITE_USE_MOCK=true 时可走通：P01 输入目标 → P02 五题澄清 → P03 预览并接受 → P04 今日任务 → P05 完成反馈 → P06 降级 Modal → P07 周复盘 → P08 进行中枢。共享组件：AppHeader、QuestCard、MeaningBlock、CompleteHero、DowngradeModal、ProgressBar、AssetTag、ClarifyOptionCard。活跃副本检测用 Mock/localStorage 驱动路由守卫。严禁调用真实后端或真实 LLM。",
+      "source_feature": "F-01-01~F-08-04, P01–P08",
+      "acceptanceCriteria": [
+        "用户在首页（P01）看到目标输入框、至少 4 个示例 Chip 可一键填入，点击「开始」进入澄清页",
+        "用户在澄清页（P02）逐题回答 5 道卡片题（可跳过、可补充文字），完成后进入主线预览页",
+        "用户在主线预览页（P03）看到 7 天计划列表、Boss 标记与「接受计划」按钮，接受后进入 Day1 每日任务页",
+        "用户在每日任务页（P04）看到当天唯一任务卡片、本周进度 x/7、「我已经完成」与「今天太难了，帮我降级」按钮",
+        "用户点击「我已经完成」进入完成反馈页（P05），看到完成态视觉、2–4 句意义文案、成长资产标签与明日预告",
+        "用户在 P04 点击「今天太难了」打开降级 Modal（P06），选择方案后 P04 显示更小的新任务",
+        "用户完成 Day7 后进入周复盘页（P07），看到本周汇总、Boss 总结、下周推荐，可点击「开启下一周副本」或「暂停，下次再说」",
+        "用户有进行中副本时访问首页或 /hub，进入进行中枢（P08），可一键进入今日任务、查看成长资产、只读查看 7 日主线",
+        "全链路文案为中文，示例含「提升 ×× 能力」规范；UI 与 docs/prototypes/ R1 色板一致",
+        "390px 与 1280px 视口下各页面无溢出、交互流畅"
+      ],
+      "technicalChecks": [
+        "npm run type-check 通过",
+        "npm run lint 通过",
+        "npm run build 通过",
+        "VITE_USE_MOCK=true 下完整 Mock 闭环可跑通（P01→P08）",
+        "Mock 数据结构与 docs/api-contracts.md 字段一致",
+        "页面不得发起真实后端 /api 请求（Network 面板无命中 localhost:8099/8003 的业务 API）",
+        "不得验收真实 LLM 或后端持久化；刷新后状态由 Mock/localStorage 驱动",
+        "不得出现跨用户/多会话实时同步验收项"
+      ],
+      "frontendIntegration": {
+        "required": false,
+        "pages": ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08"],
+        "services": ["goalService", "questService", "eventService", "assetService"],
+        "realApiEndpoints": [],
+        "mockExitCriteria": []
+      },
+      "externalServices": [],
+      "dependencies": ["T-001"],
+      "priority": 2,
+      "rules_files": ["dev-standards/frontend.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "",
+      "user_gate": true
+    },
+    {
+      "id": "T-003",
+      "title": "后端基础设施：PyCore 脚手架 + 配置 + Health",
+      "type": "backend",
+      "description": "初始化 backend/ 基于 pycore：backend/src/main.py 使用 pycore.api.APIServer；复制 pyproject.toml 工具链；backend/src/core/config.py 基于 ConfigManager 从 backend/.env 加载配置（LLM Key 仅进 .env，禁止硬编码）；实现 GET /health 返回统一响应格式；CORS 中间件注册；Agent 验证端口 8099。",
+      "source_feature": "B00",
+      "acceptanceCriteria": [
+        "backend/src/main.py 使用 pycore.api.APIServer，未自行重写 FastAPI 实例",
+        "backend/src/core/config.py 使用 pycore.core.ConfigManager，敏感配置从 backend/.env 读取",
+        "GET /health 返回 200 且 body 含 code=200、data.status=ok",
+        "pyproject.toml 已配置 ruff、mypy、pytest；质量门禁仅覆盖 backend/src 与 backend/tests"
+      ],
+      "technicalChecks": [
+        "$PY -m ruff check backend/src backend/tests 通过",
+        "$PY -m mypy backend/src backend/tests 通过",
+        "$PY -m pytest backend/tests 通过",
+        "cd backend && PYTHONPATH=.. $PY -m uvicorn src.main:app --host 127.0.0.1 --port 8099 可短时启动",
+        "curl http://127.0.0.1:8099/health 返回 200",
+        "pycore/ 未被纳入项目业务代码质量门禁",
+        "LLM_API_KEY 等敏感项未出现在代码或 tasks.json 中"
+      ],
+      "frontendIntegration": {
+        "required": false,
+        "pages": [],
+        "services": [],
+        "realApiEndpoints": [],
+        "mockExitCriteria": []
+      },
+      "externalServices": [],
+      "dependencies": ["T-002"],
+      "priority": 3,
+      "rules_files": ["dev-standards/backend-dev.md", "dev-standards/backend-layers.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-24] 全项 PASS，详见 .sdd/test-reports/test-T-003.md",
+      "user_gate": false
+    },
+    {
+      "id": "T-004",
+      "title": "后端基础设施：Session 中间件 + 数据模型 + DB 初始化",
+      "type": "backend",
+      "description": "实现 X-Session-Id 解析中间件/依赖，匿名 session 关联业务数据；基于 pycore 模板扩展 backend/src/db/models.py 与 session.py，含 Goal、UserContext、Quest、DailyEvent、GrowthAsset 五实体；scripts/init_db.py 初始化 SQLite 并落盘；backend/src/api/deps.py 基于 pycore 模板扩展 get_db 等依赖。",
+      "source_feature": "B01, B02",
+      "acceptanceCriteria": [
+        "backend/src/db/models.py 与 session.py 基于 pycore 模板扩展，含 Goal/UserContext/Quest/DailyEvent/GrowthAsset",
+        "backend/src/api/deps.py 基于 pycore 模板扩展，get_db 使用项目 src.db.session",
+        "X-Session-Id 请求头可被解析并关联 session 作用域",
+        "cd backend && PYTHONPATH=.. $PY scripts/init_db.py 执行成功，SQLite 文件与目标表真实存在"
+      ],
+      "technicalChecks": [
+        "$PY -m ruff check backend/src backend/tests 通过",
+        "$PY -m mypy backend/src backend/tests 通过",
+        "$PY -m pytest backend/tests 通过",
+        "cd backend && PYTHONPATH=.. $PY scripts/init_db.py 执行通过",
+        "真实 SQLite 文件存在，五张业务表已创建",
+        "cd backend && PYTHONPATH=.. $PY -m uvicorn src.main:app --host 127.0.0.1 --port 8099 可短时启动",
+        "无凭证访问需 session 的业务路由返回统一错误格式（401/400 按契约）"
+      ],
+      "frontendIntegration": {
+        "required": false,
+        "pages": [],
+        "services": [],
+        "realApiEndpoints": [],
+        "mockExitCriteria": []
+      },
+      "externalServices": [],
+      "dependencies": ["T-003"],
+      "priority": 4,
+      "rules_files": ["dev-standards/backend-dev.md", "dev-standards/backend-layers.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-24] 第 5 次独立复验全项 PASS；上轮 I001 已修复。详见 .sdd/test-reports/test-T-004.md",
+      "user_gate": false
+    },
+    {
+      "id": "T-005",
+      "title": "后端基础设施：硅基流动 LLM Provider 封装",
+      "type": "backend",
+      "description": "基于 pycore.integrations.llm 封装 SiliconFlow OpenAI 兼容 Provider；从 backend/.env 读取 LLM_API_KEY_A/B、LLM_BASE_URL、LLM_MODEL；按节点主备 Key 路由（计划+反馈→A 主/B 兜，降级+复盘→B 主/A 兜）；httpx trust_env=False；Key 缺失时返回 503 或 Mock Service fallback（须在测试报告标注）；JSON 输出解析与 Schema 校验 + 重试 1 次。",
+      "source_feature": "B04",
+      "acceptanceCriteria": [
+        "LLM Provider 从 backend/.env 读取 LLM_API_KEY/LLM_BASE_URL/LLM_MODEL，代码无硬编码 Key",
+        "httpx 客户端 trust_env=False，避免代理环境变量干扰",
+        "LLM_API_KEY 缺失时服务层返回 503 或明确 fallback，不静默吞错",
+        "Provider 支持结构化 JSON 响应解析与校验失败重试"
+      ],
+      "technicalChecks": [
+        "$PY -m ruff check backend/src backend/tests 通过",
+        "$PY -m mypy backend/src backend/tests 通过",
+        "$PY -m pytest backend/tests 通过（含 Key 缺失 fallback 单测）",
+        "httpx 调用处 trust_env=False 已落实",
+        "必要 Key 未硬编码进代码；真实 Key 仅存在于 backend/.env",
+        "Key 缺失时测试报告标记 Mock/fallback 验收，不得宣称真实 LLM 联调通过"
+      ],
+      "frontendIntegration": {
+        "required": false,
+        "pages": [],
+        "services": [],
+        "realApiEndpoints": [],
+        "mockExitCriteria": []
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-004"],
+      "priority": 5,
+      "rules_files": [
+        "dev-standards/backend-dev.md",
+        "dev-standards/backend-layers.md",
+        "dev-standards/backend-plugin.md"
+      ],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": null,
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-24] 第 1 次独立验证全项 PASS；真实 LLM 未联调，Mock/fallback 单测验收。详见 .sdd/test-reports/test-T-005.md",
+      "user_gate": false
+    },
+    {
+      "id": "T-006",
+      "title": "目标创建与澄清功能闭环",
+      "type": "integration",
+      "description": "实现 POST /api/v1/goals 与 PATCH /api/v1/goals/{id}/clarify（B03）；前端 P01/P02 将 Mock 替换为真实 API；VITE_USE_MOCK=false 下完成联调。含非空校验、进行中副本 422 拦截、5 题澄清卡片流与上下文沉淀。",
+      "source_feature": "F-01-01~F-02-04, B03",
+      "acceptanceCriteria": [
+        "用户在首页（P01）输入职业成长目标并点击开始，页面跳转到澄清页（P02）",
+        "用户在首页点击示例 Chip，输入框自动填入对应示例文案",
+        "用户在澄清页（P02）逐题选择或跳过 5 道题并可选补充说明，提交后页面跳转到主线预览页（P03）",
+        "用户刷新浏览器后，已提交的澄清进度仍可从后端恢复（同一 session_id）",
+        "当 Mock 已有进行中副本时，用户在首页尝试新建目标会看到友好提示（422），而非静默失败"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（goals/clarify 相关）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时 P01/P02 请求命中真实后端 /api/v1/goals 与 /api/v1/goals/{id}/clarify",
+        "frontend/vite.config.ts proxy /api 指向后端（Agent 8099 / 用户门禁 8003）",
+        "VITE_API_BASE_URL=/api",
+        "页面无 [Mock] 残留文案；Network 不命中 frontend/src/mocks/*",
+        "响应格式符合 docs/api-contracts.md",
+        "LLM Key 配置可用时完成真实联调；缺失时在测试报告标注 Mock/fallback"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P01", "P02"],
+        "services": ["goalService"],
+        "realApiEndpoints": [
+          "POST /api/v1/goals",
+          "PATCH /api/v1/goals/{goal_id}/clarify"
+        ],
+        "mockExitCriteria": [
+          "goalService 在 VITE_USE_MOCK=false 时调用真实 /api/v1/goals 与 clarify 端点",
+          "P01/P02 页面移除 goal 相关 Mock 分支或 Mock 提示"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-005"],
+      "priority": 6,
+      "rules_files": ["dev-standards/frontend.md", "dev-standards/backend-dev.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 1,
+      "blocked": false,
+      "notes": "[Tester 2026-06-24] 第 2 次独立验证全项 PASS；用户门禁已确认（2026-06-24）。详见 .sdd/test-reports/test-T-006.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-007",
+      "title": "计划生成与接受功能闭环",
+      "type": "integration",
+      "description": "实现 POST /api/v1/quests/generate 与 POST /api/v1/quests（B05–B06）；前端 P03 将 Mock 替换为真实 API；LLM 生成 7 天预览、用户接受后创建 Quest + 7 DailyEvent 并跳转 P04 Day1；非 MVP 目标返回 422 友好提示。",
+      "source_feature": "F-03-01~F-03-05, B05, B06",
+      "acceptanceCriteria": [
+        "用户完成澄清进入主线预览页（P03）后，页面展示 AI 生成的 7 天主线标题、通关条件与每日任务列表（含 Day7 Boss 标记）",
+        "用户在 P03 点击「重新生成」，页面展示新的 7 天计划预览",
+        "用户在 P03 点击「接受计划」，页面跳转到每日任务页（P04）并显示 Day1 任务",
+        "用户输入非职业成长类目标并完成澄清后，P03 展示 MVP 范围外友好收窄提示（422），不生成计划"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（quests/generate/create）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时 P03 请求命中 POST /api/v1/quests/generate 与 POST /api/v1/quests",
+        "LLM Key 可用时 generate 返回真实结构化 7 天 JSON；Key 缺失返回 503 且前端有降级提示",
+        "接受计划后 SQLite 持久化 Quest 与 7 个 DailyEvent",
+        "页面无 [Mock] 残留；mockExitCriteria 已满足",
+        "Key 缺失时测试报告标注 Mock/fallback，不得宣称真实 LLM 联调通过"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P03"],
+        "services": ["questService"],
+        "realApiEndpoints": [
+          "POST /api/v1/quests/generate",
+          "POST /api/v1/quests"
+        ],
+        "mockExitCriteria": [
+          "questService 在 VITE_USE_MOCK=false 时调用真实 generate 与 create 端点",
+          "P03 移除 quest 预览 Mock 分支"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-006"],
+      "priority": 7,
+      "rules_files": [
+        "dev-standards/frontend.md",
+        "dev-standards/backend-dev.md",
+        "dev-standards/backend-layers.md",
+        "dev-standards/backend-plugin.md"
+      ],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25] 第 1 次独立验证全项 PASS；用户门禁已确认（2026-06-25）。详见 .sdd/test-reports/test-T-007.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-008",
+      "title": "每日任务与完成反馈功能闭环",
+      "type": "integration",
+      "description": "实现 GET /api/v1/events/today 与 POST /api/v1/events/{id}/complete（B08–B09）；前端 P04/P05 将 Mock 替换为真实 API；完成今日任务后 LLM 生成意义反馈与成长资产，更新进度。",
+      "source_feature": "F-04-01~F-05-05, B08, B09",
+      "acceptanceCriteria": [
+        "用户在每日任务页（P04）看到当天唯一任务：Day 编号、标题、说明、预计用时与意义文案",
+        "用户在 P04 顶栏或任务区看到本周进度 x/7 与主线标题摘要",
+        "用户在 P04 填写产出（文本类任务）或勾选完成后点击「我已经完成」，页面跳转到完成反馈页（P05）",
+        "用户在完成反馈页（P05）看到完成态视觉、2–4 句意义解释、成长资产名称标签、更新后的 x/7 进度与明日任务预告",
+        "用户刷新浏览器后回到 P04，仍能看到正确的 current_day 今日任务（服务端持久化）"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（events/today/complete）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时 P04/P05 命中 GET /api/v1/events/today 与 POST /api/v1/events/{id}/complete",
+        "complete 响应含 feedback.meaning_text、feedback.asset、feedback.progress、feedback.tomorrow_preview",
+        "GrowthAsset 写入 DB；quest.current_day 正确推进",
+        "页面无 [Mock] 残留",
+        "LLM Key 可用时意义文案为真实生成；缺失时 503/fallback 并在测试报告标注"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P04", "P05"],
+        "services": ["eventService"],
+        "realApiEndpoints": [
+          "GET /api/v1/events/today",
+          "POST /api/v1/events/{event_id}/complete"
+        ],
+        "mockExitCriteria": [
+          "eventService 在 VITE_USE_MOCK=false 时调用真实 today 与 complete 端点",
+          "P04/P05 移除 event/feedback Mock 分支"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-007"],
+      "priority": 8,
+      "rules_files": [
+        "dev-standards/frontend.md",
+        "dev-standards/backend-dev.md",
+        "dev-standards/backend-layers.md",
+        "dev-standards/backend-plugin.md"
+      ],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": null,
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25 00:22] 第 1 次独立验证全项 PASS；pytest 53/53、前后端构建通过、events API smoke 通过、LLM 走模板 fallback（未做真实 HTTP 联调）。详见 .sdd/test-reports/test-T-008.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-009",
+      "title": "任务降级功能闭环",
+      "type": "integration",
+      "description": "实现 POST /api/v1/events/{id}/downgrade 与 PATCH /api/v1/events/{id}/apply-downgrade（B10）；前端 P06 DowngradeModal 将 Mock 替换为真实 API；用户选择降级方案后当日任务被替换，完成后仍正常进入 P05。",
+      "source_feature": "F-06-01~F-06-03, B10",
+      "acceptanceCriteria": [
+        "用户在每日任务页（P04）点击「今天太难了，帮我降级」，弹出降级 Modal 展示 1–3 个 AI 生成的更小任务方案",
+        "用户在降级 Modal 中选择一个方案并确认，Modal 关闭后 P04 显示替换后的更小任务（标题、用时、说明已更新）",
+        "用户完成降级后的任务并点击「我已经完成」，页面正常进入完成反馈页（P05），进度仍有效推进"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（downgrade/apply-downgrade）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时命中 downgrade 与 apply-downgrade 真实端点",
+        "apply-downgrade 后新 event status=in_progress，original_event_id 指向原任务",
+        "降级完成仍推进 current_day 与资产发放逻辑",
+        "页面无 [Mock] 残留",
+        "LLM Key 可用时降级方案为真实生成；缺失时 fallback 并在测试报告标注"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P04", "P06"],
+        "services": ["eventService"],
+        "realApiEndpoints": [
+          "POST /api/v1/events/{event_id}/downgrade",
+          "PATCH /api/v1/events/{event_id}/apply-downgrade"
+        ],
+        "mockExitCriteria": [
+          "eventService downgrade/applyDowngrade 在 VITE_USE_MOCK=false 时走真实 API",
+          "DowngradeModal 移除 Mock 分支"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-008"],
+      "priority": 9,
+      "rules_files": [
+        "dev-standards/frontend.md",
+        "dev-standards/backend-dev.md",
+        "dev-standards/backend-layers.md",
+        "dev-standards/backend-plugin.md"
+      ],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25] 第 1 次独立验证全项 PASS；pytest 57/57、前后端构建通过、降级 API 单测与静态 fallback 验收；未做真实 LLM HTTP 联调。详见 .sdd/test-reports/test-T-009.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-010",
+      "title": "进行中枢与成长资产功能闭环",
+      "type": "integration",
+      "description": "实现 GET /api/v1/quests/active、GET /api/v1/quests/{id}、GET /api/v1/assets（B07, B13）；前端 P08 与 P03 只读模式将 Mock 替换为真实 API；活跃副本检测驱动路由守卫与中枢展示。",
+      "source_feature": "F-08-01~F-08-04, B07, B13",
+      "acceptanceCriteria": [
+        "用户有进行中副本时访问首页，页面自动进入进行中枢（P08）而非目标输入页",
+        "用户在进行中枢（P08）看到当前主线标题、通关条件、本周进度 x/7 与已积累成长资产列表",
+        "用户在 P08 点击「进入今日任务」，页面跳转到 P04 并展示当天任务",
+        "用户在 P08 点击「查看主线详情」，进入 P03 只读模式浏览 7 日计划（不可再次接受）",
+        "用户完成至少一次任务后，P08 成长资产列表展示对应资产名称标签"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（quests/active、quests/{id}、assets）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时 P08 命中 GET /api/v1/quests/active、GET /api/v1/assets",
+        "P03 只读模式命中 GET /api/v1/quests/{quest_id}",
+        "无活跃副本时 GET /api/v1/quests/active 返回 data=null，前端回 P01",
+        "页面无 [Mock] 残留",
+        "MVP 仅允许 1 个 in_progress quest 校验生效"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P08", "P03"],
+        "services": ["questService", "assetService"],
+        "realApiEndpoints": [
+          "GET /api/v1/quests/active",
+          "GET /api/v1/quests/{quest_id}",
+          "GET /api/v1/assets"
+        ],
+        "mockExitCriteria": [
+          "questService/assetService 在 VITE_USE_MOCK=false 时走真实 API",
+          "P08 活跃副本检测改为后端 active 接口",
+          "P03 只读模式移除 Mock 分支"
+        ]
+      },
+      "externalServices": [],
+      "dependencies": ["T-008"],
+      "priority": 10,
+      "rules_files": ["dev-standards/frontend.md", "dev-standards/backend-dev.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25] 第 1 次独立验证全项 PASS；pytest 63/63、ruff/mypy/前后端构建通过；quests/active|{id}|assets 单测与 uvicorn smoke 验证 data=null 与 guards getActive 真实 API 路径。详见 .sdd/test-reports/test-T-010.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-011",
+      "title": "周复盘与开启下周功能闭环",
+      "type": "integration",
+      "description": "实现 POST /api/v1/quests/{id}/review、POST /api/v1/quests/{id}/next-week、POST /api/v1/quests/{id}/pause（B11–B12）；前端 P07 将 Mock 替换为真实 API；Day7 完成后生成复盘，用户可开启下周或暂停回 P01。",
+      "source_feature": "F-07-01~F-07-06, B11, B12",
+      "acceptanceCriteria": [
+        "用户完成 Day7 任务后在周复盘页（P07）看到本周完成汇总、产出列表、AI 观察、Boss 总结与下周副本推荐",
+        "用户在 P07 点击「开启下一周副本」，页面进入澄清或计划流程（P02/P03），准备开始新一周",
+        "用户在 P07 点击「暂停，下次再说」，页面回到首页（P01），当前副本不再作为活跃副本",
+        "用户暂停后再次访问，首页展示目标输入而非强制进入中枢"
+      ],
+      "technicalChecks": [
+        "$PY -m pytest backend/tests 通过（review/next-week/pause）",
+        "npm run type-check、lint、build 通过",
+        "VITE_USE_MOCK=false 时 P07 命中 review、next-week、pause 真实端点",
+        "review 后 quest status=completed；next-week 返回 redirect 字段；pause 后 quest abandoned、goal paused",
+        "页面无 [Mock] 残留",
+        "LLM Key 可用时复盘文案为真实生成；缺失时 fallback 并在测试报告标注",
+        "开启下周须用户主动确认（F-07-05）"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P07"],
+        "services": ["questService"],
+        "realApiEndpoints": [
+          "POST /api/v1/quests/{quest_id}/review",
+          "POST /api/v1/quests/{quest_id}/next-week",
+          "POST /api/v1/quests/{quest_id}/pause"
+        ],
+        "mockExitCriteria": [
+          "questService review/nextWeek/pause 在 VITE_USE_MOCK=false 时走真实 API",
+          "P07 移除 review Mock 分支"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-009", "T-010"],
+      "priority": 11,
+      "rules_files": [
+        "dev-standards/frontend.md",
+        "dev-standards/backend-dev.md",
+        "dev-standards/backend-layers.md",
+        "dev-standards/backend-plugin.md"
+      ],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25] 第 1 次独立验证全项 PASS；pytest 67/67、前后端构建通过；review/next-week/pause API 与 P07 真实 API 路径、quest status 变更、LLM fallback 已验证。详见 .sdd/test-reports/test-T-011.md",
+      "user_gate": true
+    },
+    {
+      "id": "T-012",
+      "title": "E2E 全链路回归 + docs/startup.md",
+      "type": "integration",
+      "description": "编写 E2E 测试覆盖主流程与异常分支；产出 docs/startup.md 启动文档（前后端端口、env 配置、Agent 5199/8099 与用户门禁 5175/8003）；VITE_USE_MOCK=false 下验证完整 7 天闭环与 LLM 503 降级路径。本任务只做全系统回归，不替代各功能任务内首次联调。",
+      "source_feature": "Plan 阶段4, PRD 14.3",
+      "acceptanceCriteria": [
+        "用户按 docs/startup.md 启动前后端（用户门禁端口 5175/8003）后，可从 P01 输入目标一路完成 7 天副本并在 P07 开启下一周，全流程无阻塞性错误",
+        "用户在 LLM 不可用（503）场景下，计划生成/降级/反馈/复盘页面展示友好错误提示，不出现白屏或未处理异常",
+        "用户在暂停副本后回到 P01，可重新开始新目标流程",
+        "docs/startup.md 清晰说明：如何配置 backend/.env、如何启动前后端、VITE_USE_MOCK 切换方式、端口说明"
+      ],
+      "technicalChecks": [
+        "E2E 测试套件执行通过（主流程 + 503 异常 + 暂停分支）",
+        "VITE_USE_MOCK=false 全链路回归通过",
+        "docs/startup.md 存在且包含 Agent 端口（5199/8099）与用户门禁端口（5175/8003）说明",
+        "vite.config.ts proxy /api 与 VITE_API_BASE_URL=/api 已在 startup 文档中说明",
+        "各功能任务已完成首次真实联调，本任务仅做跨模块回归",
+        "npm run type-check、lint、build 通过",
+        "$PY -m pytest backend/tests 通过"
+      ],
+      "frontendIntegration": {
+        "required": true,
+        "pages": ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08"],
+        "services": ["goalService", "questService", "eventService", "assetService"],
+        "realApiEndpoints": ["全量 /api/v1/* 业务端点"],
+        "mockExitCriteria": [
+          "VITE_USE_MOCK=false 下全页面无 Mock 分支命中",
+          "无 [Mock] 页面残留"
+        ]
+      },
+      "externalServices": ["硅基流动 LLM"],
+      "dependencies": ["T-011"],
+      "priority": 12,
+      "rules_files": ["dev-standards/frontend.md", "dev-standards/backend-dev.md"],
+      "status": "passed",
+      "developer_id": null,
+      "tester_id": "composer-2.5-tester",
+      "retry_count": 0,
+      "blocked": false,
+      "notes": "[Tester 2026-06-25] 第 1 次独立验证全项 PASS；pytest 72/72、E2E 5/5、ruff/mypy/前后端构建通过；startup.md 端口与 env 说明齐全。用户门禁已确认（2026-06-25）。详见 .sdd/test-reports/test-T-012.md",
+      "user_gate": true
+    }
+  ]
+}
